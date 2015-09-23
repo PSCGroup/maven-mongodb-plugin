@@ -3,7 +3,7 @@
 	<!-- | Basic project information + -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.psclistens</groupId>
-	<version>0.6</version>
+	<version>0.7-SNAPSHOT</version>
 	<artifactId>mongodb-maven-plugin</artifactId>
 	<name>mongodb maven plugin</name>
 	<packaging>maven-plugin</packaging>
@@ -44,7 +44,7 @@
         <url>https://github.com/PSCGroup/mongodb-maven-plugin.git</url>
 		<connection>scm:git:git@github.com:PSCGroup/mongodb-maven-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:PSCGroup/mongodb-maven-plugin.git</developerConnection>
-	  <tag>mongodb-maven-plugin-0.6</tag>
+	  <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
