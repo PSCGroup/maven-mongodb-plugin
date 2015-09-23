@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
  * Mojo for filling databases with data.
- * @goal update
+ * @goal training
  */
 public class MongoDBTrainingMojo
     extends AbstractMongoDBMojo {

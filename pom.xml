@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.psclistens</groupId>
 	<version>0.6-SNAPSHOT</version>
-	<artifactId>maven-mongodb-plugin</artifactId>
-	<name>maven mongodb plugin</name>
+	<artifactId>mongodb-maven-plugin</artifactId>
+	<name>mongodb maven plugin</name>
 	<packaging>maven-plugin</packaging>
-	<url>https://github.com/PSCGroup/maven-mongodb-plugin/</url>
+	<url>https://github.com/PSCGroup/mongodb-maven-plugin/</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -41,9 +41,9 @@
 	 | scm configuration
 	 +-->
 	<scm>
-		<connection>git@github.com:PSCGroup/maven-mongodb-plugin.git</connection>
-		<developerConnection>git@github.com:PSCGroup/maven-mongodb-plugin.git</developerConnection>
-		<url>https://github.com/PSCGroup/maven-mongodb-plugin.git</url>
+		<connection>git@github.com:PSCGroup/mongodb-maven-plugin.git</connection>
+		<developerConnection>git@github.com:PSCGroup/mongodb-maven-plugin.git</developerConnection>
+		<url>https://github.com/PSCGroup/mongodb-maven-plugin.git</url>
 	</scm>
 
     <distributionManagement>
