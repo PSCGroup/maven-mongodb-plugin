@@ -13,22 +13,23 @@ public class ConnectionSettings {
     private String database;
     private String userName;
     private String password;
+    private String replicaSet;
     private MongoOptions options;
-    
+
     /**
      * @return the serverId
      */
     public String getServerId() {
         return serverId;
     }
-    
+
     /**
      * @param serverId the serverId to set
      */
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
-    
+
     /**
 	 * @return the hostname
 	 */
@@ -113,4 +114,22 @@ public class ConnectionSettings {
 		this.options = options;
 	}
 
+    /**
+     * @return
+     */
+    public String getReplicaSet() {
+        return replicaSet;
+    }
+
+    /**
+     * server1
+     * server1,server2
+     * server1:123,server2
+     * server1:123,server2:123
+     *
+     * @param replicaSet A comma separated list of server and port number combinations.
+     */
+    public void setReplicaSet(String replicaSet) {
+        this.replicaSet = replicaSet;
+    }
 }

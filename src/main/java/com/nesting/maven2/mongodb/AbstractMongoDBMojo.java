@@ -1,6 +1,17 @@
 
 package com.nesting.maven2.mongodb;
 
+import com.mongodb.CommandResult;
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import com.mongodb.ServerAddress;
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,21 +20,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.zip.GZIPInputStream;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import com.mongodb.ServerAddress;
 
 /**
  * Abstract mojo that all DB related mojos
@@ -31,6 +35,8 @@ import com.mongodb.ServerAddress;
  */
 public abstract class AbstractMongoDBMojo
     extends AbstractMojo {
+
+    private static final Pattern REPLICA_SEED_REGEX = Pattern.compile("([^:,]+)(:([^,]*))?", Pattern.MULTILINE);
 
     /**
      * The database connection settings for
@@ -233,15 +239,45 @@ public abstract class AbstractMongoDBMojo
         throws MojoFailureException,
         UnknownHostException {
 
-        // get server address
-        ServerAddress serverAddr = (dbConnectionSettings.getPort()!=null)
-        	? new ServerAddress(dbConnectionSettings.getHostname(), dbConnectionSettings.getPort().intValue())
-        	: new ServerAddress(dbConnectionSettings.getHostname());
+        String replicaSet = dbConnectionSettings.getReplicaSet();
+        List replicaSetSeeds = null;
+        if (replicaSet != null && replicaSet.trim().length() > 0) {
+            replicaSetSeeds = new ArrayList();
 
-        // get Mongo
-        Mongo mongo = (dbConnectionSettings.getOptions()!=null)
-	    	? new Mongo(serverAddr, dbConnectionSettings.getOptions())
-	    	: new Mongo(serverAddr);
+            Matcher regexMatcher = REPLICA_SEED_REGEX.matcher(replicaSet);
+            while (regexMatcher.find()) {
+
+                String hostname = regexMatcher.group(1);
+                String port = regexMatcher.group(3);
+
+                ServerAddress serverAddress;
+                if (port != null && port.trim().length() > 0) {
+                    serverAddress = new ServerAddress(hostname.trim(), Integer.parseInt(port));
+                } else {
+                    serverAddress = new ServerAddress(hostname.trim());
+                }
+
+                replicaSetSeeds.add(serverAddress);
+            }
+        }
+
+        Mongo mongo;
+        if (replicaSetSeeds != null && replicaSetSeeds.size() > 0) {
+            // get Mongo
+            mongo = (dbConnectionSettings.getOptions()!=null)
+                    ? new Mongo(replicaSetSeeds, dbConnectionSettings.getOptions())
+                    : new Mongo(replicaSetSeeds);
+        } else {
+            // get server address
+            ServerAddress serverAddr = (dbConnectionSettings.getPort()!=null)
+                    ? new ServerAddress(dbConnectionSettings.getHostname(), dbConnectionSettings.getPort().intValue())
+                    : new ServerAddress(dbConnectionSettings.getHostname());
+
+            // get Mongo
+            mongo = (dbConnectionSettings.getOptions()!=null)
+                    ? new Mongo(serverAddr, dbConnectionSettings.getOptions())
+                    : new Mongo(serverAddr);
+        }
 
         // we're good :)
         return mongo;
