@@ -30,8 +30,8 @@ import com.mongodb.ServerAddress;
  * inherit from.
  */
 public abstract class AbstractMongoDBMojo
-    extends AbstractMojo {    
-    
+    extends AbstractMojo {
+
     /**
      * The database connection settings for
      * the application.
@@ -39,7 +39,7 @@ public abstract class AbstractMongoDBMojo
      * @required
      */
     private ConnectionSettings dbConnectionSettings;
-    
+
     /**
      * The {@link Settings} object.
      * @parameter default-value="${settings}"
@@ -47,32 +47,32 @@ public abstract class AbstractMongoDBMojo
      * @readonly
      */
     private Settings settings;
- 
+
     /**
      * The encoding of update scripts.
      * @parameter
      */
     private String scriptEncoding;
-    
+
     /**
      * Child mojos need to implement this.
      * @throws MojoExecutionException on error
      * @throws MojoFailureException on error
      */
-    public abstract void executeInternal() 
-        throws MojoExecutionException, 
+    public abstract void executeInternal()
+        throws MojoExecutionException,
         MojoFailureException;
-    
+
     /**
      * {@inheritDoc}
      */
-    public final void execute() 
-        throws MojoExecutionException, 
+    public final void execute()
+        throws MojoExecutionException,
         MojoFailureException {
         checkDbSettings(dbConnectionSettings, "dbConnectionSettings");
         executeInternal();
     }
-    
+
     /**
      * Checks the given database connection settings.
      * @param dbSettings the settings to check
@@ -80,10 +80,10 @@ public abstract class AbstractMongoDBMojo
      * @throws MojoExecutionException on error
      * @throws MojoFailureException on error
      */
-    private void checkDbSettings(ConnectionSettings dbSettings, String name) 
-        throws MojoExecutionException, 
+    private void checkDbSettings(ConnectionSettings dbSettings, String name)
+        throws MojoExecutionException,
         MojoFailureException {
-        
+
         // check server
         if (!StringUtils.isEmpty(dbSettings.getServerId())) {
             Server server = settings.getServer(dbSettings.getServerId());
@@ -96,48 +96,48 @@ public abstract class AbstractMongoDBMojo
                     "["+name+"] Server ID: "+dbSettings.getServerId()+" found, "
                     +"but username is empty!");
             }
-            
+
         // check non server settings
         } else if (StringUtils.isEmpty(dbSettings.getHostname())) {
             throw new MojoFailureException("["+name+"] No hostname defined!");
         }
-        
+
     }
-    
+
     /**
      * Executes all of the scripts in a given directory
      * using the given Mongo object.
      * @param directory the directory where the scripts reside
-     * @param mongo the Mongo
+     * @param db the Mongo DB
      * @throws MojoFailureException on error
      * @throws MojoExecutionException on error
      * @throws IOException on error
      */
-    protected void executeScriptsInDirectory(File directory, DB db) 
+    protected void executeScriptsInDirectory(File directory, DB db)
         throws MojoFailureException,
         MojoExecutionException,
         IOException {
-        
+
         // talk a bit :)
         getLog().info("Executing scripts in: "+directory.getName());
 
-        // make sure we can read it, and that it's 
+        // make sure we can read it, and that it's
         // a file and not a directory
         if (!directory.isDirectory()) {
             throw new MojoFailureException(
                 directory.getName()+" is not a directory");
         }
-        
+
         // get all files in directory
         File[] files = directory.listFiles();
-        
+
         // sort
         Arrays.sort(files, new Comparator() {
             public int compare(Object arg0, Object arg1) {
                 return ((File)arg0).getName().compareTo(((File)arg1).getName());
             } }
         );
-        
+
         // loop through all the files and execute them
         for (int i = 0; i<files.length; i++) {
             if (!files[i].isDirectory() && files[i].isFile()) {
@@ -148,42 +148,42 @@ public abstract class AbstractMongoDBMojo
                 getLog().info(" script completed execution in "+elapsed+" second(s)");
             }
         }
-        
+
     }
-    
+
     /**
      * Executes the given script, using the given Mongo.
      * @param file the file to execute
-     * @param mongo the db
+     * @param db the db
      * @throws MojoFailureException on error
      * @throws MojoExecutionException on error
      * @throws IOException on error
      */
-    protected void executeScript(File file, DB db) 
+    protected void executeScript(File file, DB db)
         throws MojoFailureException,
         MojoExecutionException,
         IOException {
-        
+
         // talk a bit :)
         getLog().info("executing script: "+file.getName());
-        
-        // make sure we can read it, and that it's 
+
+        // make sure we can read it, and that it's
         // a file and not a directory
-        if (!file.exists() || !file.canRead() 
+        if (!file.exists() || !file.canRead()
             || file.isDirectory() || !file.isFile()) {
             throw new MojoFailureException(file.getName()+" is not a file");
         }
-        
+
         // open input stream to file
         InputStream ips = new FileInputStream(file);
-        
+
         // if it's a compressed file (gzip) then unzip as
         // we read it in
         if (file.getName().toUpperCase().endsWith("GZ")) {
             ips = new GZIPInputStream(ips);
             getLog().info(" file is gz compressed, using gzip stream");
         }
-        
+
         // our file reader
         Reader reader;
         if (StringUtils.isBlank(scriptEncoding)) {
@@ -200,14 +200,14 @@ public abstract class AbstractMongoDBMojo
 
         // loop through the statements
         while ((line = in.readLine()) != null) {
-            
+
             // append the line
             line.trim();
             data.append("\n").append(line);
         }
         reader.close();
         in.close();
-        
+
         // execute last statement
         try {
         	CommandResult result = db.doEval("(function() {"+data.toString()+"})();", new Object[0]);
@@ -221,16 +221,15 @@ public abstract class AbstractMongoDBMojo
         } catch(Exception e) {
         	getLog().error(" error executing "+file.getName(), e);
         }
-        
+
     }
     /**
      * Opens a connection using the given settings.
-     * @param dbSettings the connection settings
      * @return the Connection
      * @throws MojoFailureException on error
-     * @throws UnknownHostException 
+     * @throws UnknownHostException when the hostname cannot be found.
      */
-    protected Mongo openConnection() 
+    protected Mongo openConnection()
         throws MojoFailureException,
         UnknownHostException {
 
@@ -243,7 +242,7 @@ public abstract class AbstractMongoDBMojo
         Mongo mongo = (dbConnectionSettings.getOptions()!=null)
 	    	? new Mongo(serverAddr, dbConnectionSettings.getOptions())
 	    	: new Mongo(serverAddr);
-        
+
         // we're good :)
         return mongo;
     }
@@ -251,19 +250,18 @@ public abstract class AbstractMongoDBMojo
     /**
      * Returns a DB from the given settings and mongo.
      * @param mongo the mongo
-     * @param dbSettings the settings
      * @return the DB
      */
     protected DB getDatabase(Mongo mongo) {
-    	
+
     	String username, password = null;
-        
+
         // use settings to get authentication info for the given server
         if (!StringUtils.isEmpty(dbConnectionSettings.getServerId())) {
             Server server = settings.getServer(dbConnectionSettings.getServerId());
             username = server.getUsername();
             password = server.getPassword();
-            
+
         // use settings in pom.xml
         } else {
             username = dbConnectionSettings.getUserName();
