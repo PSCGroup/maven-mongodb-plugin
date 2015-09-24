@@ -104,10 +104,9 @@ public abstract class AbstractMongoDBMojo
             }
 
         // check non server settings
-        } else if (StringUtils.isEmpty(dbSettings.getHostname())) {
-            throw new MojoFailureException("["+name+"] No hostname defined!");
+        } else if (StringUtils.isEmpty(dbSettings.getHostname()) && StringUtils.isEmpty(dbSettings.getReplicaSet())  ) {
+            throw new MojoFailureException("["+name+"] hostname or replicaSet must be defined!");
         }
-
     }
 
     /**
