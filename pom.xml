@@ -3,7 +3,7 @@
 	<!-- | Basic project information + -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.psclistens</groupId>
-	<version>0.8</version>
+	<version>0.9-SNAPSHOT</version>
 	<artifactId>mongodb-maven-plugin</artifactId>
 	<name>mongodb maven plugin</name>
     <description>Maven plugin to execute mongo scripts against a database.</description>
@@ -45,7 +45,7 @@
         <url>https://github.com/PSCGroup/mongodb-maven-plugin.git</url>
 		<connection>scm:git:git@github.com:PSCGroup/mongodb-maven-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:PSCGroup/mongodb-maven-plugin.git</developerConnection>
-	  <tag>mongodb-maven-plugin-0.8</tag>
+	  <tag>mongodb-maven-plugin-0.6</tag>
   </scm>
 
     <distributionManagement>
