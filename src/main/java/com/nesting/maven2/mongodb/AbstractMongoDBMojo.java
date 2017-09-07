@@ -319,4 +319,27 @@ public abstract class AbstractMongoDBMojo
     	mongo.dropDatabase(dbConnectionSettings.getDatabase());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected void executeForDirectories(File[] directories)
+            throws MojoExecutionException,
+            MojoFailureException {
+
+        if (directories == null) {
+            throw new MojoExecutionException("Directory was not defined for this execution: " + this.getClass().getName());
+        }
+
+        try {
+            Mongo mongo = openConnection();
+            DB db = getDatabase(mongo);
+            for (int i = 0; i < directories.length; i++) {
+                executeScriptsInDirectory(directories[i], db);
+            }
+
+        } catch(IOException ioe) {
+            throw new MojoExecutionException(
+                    "Error executing scripts", ioe);
+        }
+    }
 }

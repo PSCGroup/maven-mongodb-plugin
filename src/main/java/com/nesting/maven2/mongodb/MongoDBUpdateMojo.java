@@ -13,7 +13,7 @@ import com.mongodb.Mongo;
  * Mojo for filling databases with data.
  * @goal update
  */
-public class MongoDBUpdateMojo 
+public class MongoDBUpdateMojo
     extends AbstractMongoDBMojo {
 
     /**
@@ -22,25 +22,11 @@ public class MongoDBUpdateMojo
      * @required
      */
     private File[] dbUpdateScriptsDirectory;
-    
+
     /**
      * {@inheritDoc}
      */
-    public void executeInternal() 
-        throws MojoExecutionException, 
-        MojoFailureException {
-        
-        try {
-            Mongo mongo = openConnection();
-            DB db = getDatabase(mongo);
-            for (int i=0; i<dbUpdateScriptsDirectory.length; i++) {
-                executeScriptsInDirectory(
-                	dbUpdateScriptsDirectory[i], db);
-            }
-            
-        } catch(IOException ioe) {
-            throw new MojoExecutionException(
-                "Error executing update scripts", ioe);
-        }
+    public void executeInternal() throws MojoExecutionException, MojoFailureException {
+        executeForDirectories(dbUpdateScriptsDirectory);
     }
 }

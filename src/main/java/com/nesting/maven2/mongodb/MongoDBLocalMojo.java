@@ -10,21 +10,21 @@ import java.io.IOException;
 
 /**
  * Mojo for filling databases with data.
- * @goal training
+ * @goal local
  */
-public class MongoDBTrainingMojo
+public class MongoDBLocalMojo
     extends AbstractMongoDBMojo {
 
     /**
      * The directory that contains update scripts.
      * @parameter
      */
-    private File[] dbTrainingScriptsDirectory;
+    private File[] dbLocalScriptsDirectory;
 
     /**
      * {@inheritDoc}
      */
     public void executeInternal() throws MojoExecutionException, MojoFailureException {
-        executeForDirectories(dbTrainingScriptsDirectory);
+        executeForDirectories(dbLocalScriptsDirectory);
     }
 }
